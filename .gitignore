@@ -1,0 +1,13 @@
+80C51/Debug/
+*.workspace
+*.pdsbak
+*.hex
+*.sym
+*.lst
+*.rel
+*.rst
+*.asm
+*.lnk
+80C51/Release/Makefile
+*.map
+*.mem
