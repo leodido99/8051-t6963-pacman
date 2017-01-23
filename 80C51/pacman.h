@@ -1,6 +1,8 @@
 #ifndef ___PACMAN_H
 #define ___PACMAN_H
 
+#include "main.h"
+#include "keyboard.h"
 
 typedef enum {
 	MOVES_UP,
@@ -12,7 +14,8 @@ typedef enum {
 typedef enum {
 	ALIVE,
 	DEAD,
-	EATING
+	POWERUP,
+	BERZERK
 } Status;
 
 typedef struct {
@@ -21,10 +24,14 @@ typedef struct {
 	Status status;
 	unsigned char livesLeft;
 	unsigned int points;
+	unsigned char lastHeadCharacter;
 } Pacman;
 
+Status Pacman_iterate(Pacman *pacman, Arrow arrow);
 void Pacman_move(Pacman *pacman);
 void Pacman_turn(Pacman *pacman, Arrow arrow);
+void Pacman_showHead(Pacman *pacman);
+void Pacman_liveOrDie(Pacman *pacman);
 
 
 #endif

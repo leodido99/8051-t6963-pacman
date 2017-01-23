@@ -31,12 +31,14 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 6, OBSTACLE_G);
 	GMB_copyFromRomToCg( 7, OBSTACLE_H);
 
-	GMB_copyFromRomToCg( 8, SNAKE_BODY);
-	GMB_copyFromRomToCg( 9, SNAKE_SWALLOW);
-	GMB_copyFromRomToCg(10, SNAKE_HEAD);
+	GMB_copyFromRomToCg( 8, PACMAN_BODY1);
+	GMB_copyFromRomToCg( 9, PACMAN_BODY1);
+   
+   
+/*	GMB_copyFromRomToCg(10, SNAKE_HEAD);
 	GMB_copyFromRomToCg(11, SNAKE_DEAD);
 
-	GMB_copyFromRomToCg(12, FRUIT);
+	GMB_copyFromRomToCg(12, FRUIT);*/
 }
 
 /**

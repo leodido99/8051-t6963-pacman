@@ -2,9 +2,8 @@
 #include "stdio-t6963c.h"
 #include "test.h"
 #include "buffer.h"
-#include "snake.h"
+#include "pacman.h"
 #include "keyboard.h"
-#include "fruit.h"
 #include "gameboard.h"
 
 // Snake-0
@@ -22,20 +21,25 @@ void initialize() {
 }
 
 void play() {
-	Snake snake = {MOVES_RIGHT, {10, 10}, ALIVE, 5};
+	Pacman pacman = {MOVES_RIGHT, {10, 10}, ALIVE, 3, 0, PACMAN_BODY2};
 	unsigned char *keyboard = (unsigned char __xdata *) 0x3000;
 	Arrow arrow;
+	Status status;
 
 	GMB_draw(SNAKE_LIMIT_X0, SNAKE_LIMIT_Y0, SNAKE_LIMIT_X1, SNAKE_LIMIT_Y1);
-	FRUIT_place();
+	
+	/* Place powerups */
+	
 	do {
 		arrow = KEYBOARD_readArrows(keyboard);
-		if (SNAKE_iterate(&snake, arrow) == EATING) {
-			FRUIT_place();
+	        status = Pacman_iterate(&pacman, arrow);
+		if (status == DEAD) {
+			/* Restart */
+			pacman.livesLeft--;
 		}		
 		pause(20000);
-	} while (snake.status != DEAD);
-	GMB_display(3, 7, " Le serpent est mort ");
+	} while (pacman.livesLeft > 0);
+	GMB_display(3, 7, " Game Over!");
 }
 
 void main(void) {

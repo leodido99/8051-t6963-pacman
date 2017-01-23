@@ -20,12 +20,24 @@ int testGameboard();
 #define OBSTACLE_G (0x27 + CHAR_BASE)
 #define OBSTACLE_H (0x28 + CHAR_BASE)
 
-#define SNAKE_BODY (0x11 + CHAR_BASE)
-#define SNAKE_SWALLOW (0x12 + CHAR_BASE)
-#define SNAKE_HEAD (0x13 + CHAR_BASE)
-#define SNAKE_DEAD (0x14 + CHAR_BASE)
+#define PACMAN_BODY1 (0x11 + CHAR_BASE)
+#define PACMAN_BODY2 (0x11 + CHAR_BASE)
+//#define PACMAN_BODY2 (0x12 + CHAR_BASE)
+#define PACMAN_POWERUP (0x14 + CHAR_BASE)
+#define PACMAN_DEAD (0x15 + CHAR_BASE)
 
-#define FRUIT (0x15 + CHAR_BASE)
+#define COIN_SMALL (0x16 + CHAR_BASE)
+#define COIN_LARGE (0x17 + CHAR_BASE)
+#define CHERRY (0x18 + CHAR_BASE)
+
+#define GHOST1 (0x19 + CHAR_BASE)
+#define GHOST2 (0x1A + CHAR_BASE)
+#define GHOST3 (0x1B + CHAR_BASE)
+
+#define COIN_SMALL_POINTS 1
+#define COIN_LARGE_POINTS 5
+#define CHERRY_POINTS 10
+#define GHOST_POINTS 200
 
 void GMB_initialize();
 void GMB_draw(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1);
