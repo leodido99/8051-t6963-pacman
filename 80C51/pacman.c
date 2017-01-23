@@ -6,6 +6,7 @@
  * @param snake La description du serpent.
  */
 void Pacman_move(Pacman *pacman) {
+   /* TODO check for colision before moving */
    switch(pacman->direction) {
       case MOVES_DOWN:
 	 pacman->position.y++;
@@ -47,17 +48,24 @@ void Pacman_turn(Pacman *pacman, Arrow arrow) {
    }   
 }
 
+void Pacman_liveOrDie(Pacman *pacman) {
+
+}
+
+void Pacman_showHead(Pacman *pacman) {
+
+   
+}
+
 /**
  * Effectue une itération dans la vie du serpent.
  * @param snake La définition du serpent.
  * @return L'état du serpent après l'itération.
  */
 Status Pacman_iterate(Pacman *pacman, Arrow arrow) {
-	SNAKE_showBody(snake);
-	SNAKE_turn(snake, arrow);
-	SNAKE_move(snake);
-	SNAKE_liveOrDie(snake);
-	SNAKE_showHead(snake);
-
+	Pacman_turn(pacman, arrow);
+	Pacman_move(pacman);
+	Pacman_liveOrDie(pacman);
+	Pacman_showHead(pacman);
 	return pacman->status;
 }
