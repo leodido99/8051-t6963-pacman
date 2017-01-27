@@ -11,28 +11,33 @@ int testGameboard();
 
 #define EMPTY 0x00
 
-#define OBSTACLE_A (0x21 + CHAR_BASE)
-#define OBSTACLE_B (0x22 + CHAR_BASE)
-#define OBSTACLE_C (0x23 + CHAR_BASE)
-#define OBSTACLE_D (0x24 + CHAR_BASE)
-#define OBSTACLE_E (0x25 + CHAR_BASE)
-#define OBSTACLE_F (0x26 + CHAR_BASE)
-#define OBSTACLE_G (0x27 + CHAR_BASE)
-#define OBSTACLE_H (0x28 + CHAR_BASE)
+#define PACMAN_UP_BODY1 (0x11 + CHAR_BASE)
+#define PACMAN_UP_BODY2 (0x12 + CHAR_BASE)
+#define PACMAN_DOWN_BODY1 (0x13 + CHAR_BASE)
+#define PACMAN_DOWN_BODY2 (0x14 + CHAR_BASE)
+#define PACMAN_LEFT_BODY1 (0x15 + CHAR_BASE)
+#define PACMAN_LEFT_BODY2 (0x16 + CHAR_BASE)
+#define PACMAN_RIGHT_BODY1 (0x17 + CHAR_BASE)
+#define PACMAN_RIGHT_BODY2 (0x18 + CHAR_BASE)
+#define PACMAN_DEAD (0x19 + CHAR_BASE)
 
-#define PACMAN_BODY1 (0x11 + CHAR_BASE)
-#define PACMAN_BODY2 (0x11 + CHAR_BASE)
-//#define PACMAN_BODY2 (0x12 + CHAR_BASE)
-#define PACMAN_POWERUP (0x14 + CHAR_BASE)
-#define PACMAN_DEAD (0x15 + CHAR_BASE)
+#define OBSTACLE_LEFT_DOWN  (0x1A + CHAR_BASE)
+#define OBSTACLE_LEFT_UP    (0x1B + CHAR_BASE)
+#define OBSTACLE_RIGHT_DOWN (0x1C + CHAR_BASE)
+#define OBSTACLE_RIGHT_UP   (0x1D + CHAR_BASE)
+#define OBSTACLE_VERTICAL   (0x1E + CHAR_BASE)
+#define OBSTACLE_HORIZONTAL (0x1F + CHAR_BASE)
 
-#define COIN_SMALL (0x16 + CHAR_BASE)
-#define COIN_LARGE (0x17 + CHAR_BASE)
-#define CHERRY (0x18 + CHAR_BASE)
+#define COIN_SMALL (0x20 + CHAR_BASE)
+#define COIN_LARGE (0x21 + CHAR_BASE)
+#define CHERRY (0x22 + CHAR_BASE)
 
-#define GHOST1 (0x19 + CHAR_BASE)
-#define GHOST2 (0x1A + CHAR_BASE)
-#define GHOST3 (0x1B + CHAR_BASE)
+#define GHOST1_NORMAL (0x23 + CHAR_BASE)
+#define GHOST1_WEAK (0x24 + CHAR_BASE)
+#define GHOST2_NORMAL (0x25 + CHAR_BASE)
+#define GHOST2_WEAK (0x26 + CHAR_BASE)
+#define GHOST3_NORMAL (0x27 + CHAR_BASE)
+#define GHOST3_WEAK (0x28 + CHAR_BASE)
 
 #define COIN_SMALL_POINTS 1
 #define COIN_LARGE_POINTS 5
@@ -43,5 +48,7 @@ void GMB_initialize();
 void GMB_draw(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1);
 void GMB_clear(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1);
 void GMB_display(unsigned char x0, unsigned char y0, char *text);
+void GMB_drawLevel(void);
+unsigned char GMB_MovePossible(unsigned char x, unsigned y);
 
 #endif

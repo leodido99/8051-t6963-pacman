@@ -22,23 +22,58 @@ void GMB_copyFromRomToCg(unsigned char positionInRom, unsigned char cgCode) {
  * Initialise les caractères utilisés pendant le jeu.
  */
 void GMB_initialize() {
-	GMB_copyFromRomToCg( 0, OBSTACLE_A);
-	GMB_copyFromRomToCg( 1, OBSTACLE_B);
-	GMB_copyFromRomToCg( 2, OBSTACLE_C);
-	GMB_copyFromRomToCg( 3, OBSTACLE_D);
-	GMB_copyFromRomToCg( 4, OBSTACLE_E);
-	GMB_copyFromRomToCg( 5, OBSTACLE_F);
-	GMB_copyFromRomToCg( 6, OBSTACLE_G);
-	GMB_copyFromRomToCg( 7, OBSTACLE_H);
-
-	GMB_copyFromRomToCg( 8, PACMAN_BODY1);
-	GMB_copyFromRomToCg( 9, PACMAN_BODY1);
+	GMB_copyFromRomToCg( 0, PACMAN_UP_BODY1);
+	GMB_copyFromRomToCg( 1, PACMAN_UP_BODY2);
+   	GMB_copyFromRomToCg( 2, PACMAN_DOWN_BODY1);
+	GMB_copyFromRomToCg( 3, PACMAN_DOWN_BODY2);
+   	GMB_copyFromRomToCg( 4, PACMAN_LEFT_BODY1);
+	GMB_copyFromRomToCg( 5, PACMAN_LEFT_BODY2);
+   	GMB_copyFromRomToCg( 6, PACMAN_RIGHT_BODY1);
+	GMB_copyFromRomToCg( 7, PACMAN_RIGHT_BODY2);
    
-   
-/*	GMB_copyFromRomToCg(10, SNAKE_HEAD);
-	GMB_copyFromRomToCg(11, SNAKE_DEAD);
+	GMB_copyFromRomToCg( 8, OBSTACLE_LEFT_DOWN);
+	GMB_copyFromRomToCg( 9, OBSTACLE_LEFT_UP);
+	GMB_copyFromRomToCg( 10, OBSTACLE_RIGHT_DOWN);
+	GMB_copyFromRomToCg( 11, OBSTACLE_RIGHT_UP); 
+	GMB_copyFromRomToCg( 12, OBSTACLE_VERTICAL);
+	GMB_copyFromRomToCg( 13, OBSTACLE_HORIZONTAL);
 
-	GMB_copyFromRomToCg(12, FRUIT);*/
+	GMB_copyFromRomToCg( 14, GHOST1_NORMAL);
+	GMB_copyFromRomToCg( 15, GHOST1_WEAK);
+   	GMB_copyFromRomToCg( 14, GHOST2_NORMAL);
+	GMB_copyFromRomToCg( 15, GHOST2_WEAK);
+	GMB_copyFromRomToCg( 14, GHOST3_NORMAL);
+	GMB_copyFromRomToCg( 15, GHOST3_WEAK);
+}
+
+/**
+ * Returns true if the provided position is free to move to
+ * or false otherwise
+ */
+unsigned char GMB_MovePossible(unsigned char x, unsigned y) {
+   unsigned char possibleMove;
+   unsigned char charAtPosition = T6963C_readFrom(x, y);
+   switch(charAtPosition) {
+      case OBSTACLE_LEFT_DOWN:
+      case OBSTACLE_LEFT_UP:
+      case OBSTACLE_RIGHT_DOWN:
+      case OBSTACLE_RIGHT_UP:
+      case OBSTACLE_VERTICAL:
+      case OBSTACLE_HORIZONTAL:
+	 possibleMove = 0;
+	 break;
+      default:
+	 possibleMove = 1;
+	 break;
+   }
+   return possibleMove;
+}
+
+/**
+ * Draws the complete level on the display
+ */
+void GMB_drawLevel(void) {
+      /* Todo */
 }
 
 /**
@@ -64,18 +99,18 @@ void GMB_draw(unsigned char x0, unsigned char y0, unsigned char x1, unsigned cha
    */
       
    
-   T6963C_writeAt(x0, y0, OBSTACLE_A);
+   T6963C_writeAt(x0, y0, OBSTACLE_LEFT_UP);
    for(i = x0+1; i < x1; i++) {
-      T6963C_writeAt(i, y0, OBSTACLE_B);
-      T6963C_writeAt(i, y1, OBSTACLE_G);
+      T6963C_writeAt(i, y0, OBSTACLE_HORIZONTAL);
+      T6963C_writeAt(i, y1, OBSTACLE_HORIZONTAL);
    }
-   T6963C_writeAt(x1, y0, OBSTACLE_C);
+   T6963C_writeAt(x1, y0, OBSTACLE_RIGHT_UP);
    for(i = y0+1; i < y1; i++) {
-      T6963C_writeAt(x0, i, OBSTACLE_D);
-      T6963C_writeAt(x1, i, OBSTACLE_E);
+      T6963C_writeAt(x0, i, OBSTACLE_VERTICAL);
+      T6963C_writeAt(x1, i, OBSTACLE_VERTICAL);
    }
-   T6963C_writeAt(x1, y1, OBSTACLE_H);
-   T6963C_writeAt(x0, y1, OBSTACLE_F);
+   T6963C_writeAt(x1, y1, OBSTACLE_RIGHT_DOWN);
+   T6963C_writeAt(x0, y1, OBSTACLE_LEFT_DOWN);
    
 }
 

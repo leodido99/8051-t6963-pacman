@@ -4,30 +4,8 @@
 #include "ghosts.h"
 #include "buffer.h"
 
-/**
- * Returns true if Pacman can move to the position
- * or false otherwise
- */
-unsigned char CanMove(unsigned char x, unsigned y) {
-   unsigned char possibleMove;
-   unsigned char charAtPosition = T6963C_readFrom(x, y);
-   switch(charAtPosition) {
-      case OBSTACLE_A:
-      case OBSTACLE_B:
-      case OBSTACLE_C:
-      case OBSTACLE_D:
-      case OBSTACLE_E:
-      case OBSTACLE_F:
-      case OBSTACLE_G:
-      case OBSTACLE_H:
-	 possibleMove = 0;
-	 break;
-      default:
-	 possibleMove = 1;
-	 break;
-   }
-   return possibleMove;
-}
+/* Used to know if the pacman must be erased this iteration */
+unsigned char g_erase_pacman = 0;
 
 /**
  * Modifie les coordonnées du pacman selon sa direction.
@@ -50,10 +28,11 @@ void Pacman_move(Pacman *pacman) {
 	 break;       
    }
    /* Only move if it is possible */
-   if (CanMove(new_x, new_y) == 1) {
-      /* Erase last position pacman */
+   if (GMB_MovePossible(new_x, new_y) == 1) {
+      /* Save pacman last position */
       BUFFER_in(pacman->position.x);
       BUFFER_in(pacman->position.y);
+      g_erase_pacman = 1;
       pacman->position.x = new_x;
       pacman->position.y = new_y;
    }
@@ -100,16 +79,16 @@ void Pacman_liveOrDie(Pacman *pacman) {
       case CHERRY:
 	 pacman->points += CHERRY_POINTS;
 	 break;
-      case GHOST1:
-      case GHOST2:
-      case GHOST3:
-	 if (pacman->status == BERZERK) {
-	    /* Dead ghost */
-	    Ghost_Dies(charAtPosition);
-	    pacman->points += GHOST_POINTS;
-	 } else {
-	    pacman->status = DEAD;
-	 }	 
+      case GHOST1_WEAK:
+      case GHOST2_WEAK:
+      case GHOST3_WEAK:
+	 /* Dead ghost */
+	 EventGhostDies(charAtPosition);
+	 pacman->points += GHOST_POINTS;	 
+      case GHOST1_NORMAL:
+      case GHOST2_NORMAL:
+      case GHOST3_NORMAL:
+	 pacman->status = DEAD;
 	 break;
    }
 }
@@ -120,17 +99,13 @@ void Pacman_liveOrDie(Pacman *pacman) {
  */
 unsigned char GetBodyCharacter(Pacman *pacman) {
    unsigned char body;
-   if (pacman->status == POWERUP) {
-      body = PACMAN_POWERUP;
-   } else if (pacman->status == DEAD) {
+   if (pacman->status == DEAD) {
       body = PACMAN_DEAD;
    } else {
       /* Alternate between body 1 and body 2 */
-      if (pacman->lastHeadCharacter == PACMAN_BODY1) {
-	 pacman->lastHeadCharacter = body = PACMAN_BODY2;
-      } else {
-	 pacman->lastHeadCharacter = body = PACMAN_BODY1;
-      }
+      body = PACMAN_UP_BODY1 + pacman->direction * 2 + pacman->lastBody;
+      /* Toggle body type */
+      pacman->lastBody ^= 1;
    }
    return body;
 }
@@ -139,8 +114,13 @@ unsigned char GetBodyCharacter(Pacman *pacman) {
  * Shows the pacman head at the current position
  */
 void Pacman_showHead(Pacman *pacman) {
-   unsigned char old_x = BUFFER_out(), old_y = BUFFER_out();
-   T6963C_writeAt(old_x, old_y, EMPTY);
+   unsigned char old_x, old_y;
+   if (g_erase_pacman == 1) {
+      old_x = BUFFER_out();
+      old_y = BUFFER_out();
+      T6963C_writeAt(old_x, old_y, EMPTY);
+      g_erase_pacman = 0;
+   }
    T6963C_writeAt(pacman->position.x, pacman->position.y, GetBodyCharacter(pacman));
 }
 
@@ -156,3 +136,17 @@ Status Pacman_iterate(Pacman *pacman, Arrow arrow) {
 	Pacman_showHead(pacman);
 	return pacman->status;
 }
+
+#ifdef TEST
+
+
+
+int testPacman() {
+   int testsInError = 0;
+   
+   
+   
+   return testsInError;
+}
+
+#endif

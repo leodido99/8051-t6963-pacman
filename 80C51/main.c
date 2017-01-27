@@ -5,6 +5,7 @@
 #include "pacman.h"
 #include "keyboard.h"
 #include "gameboard.h"
+#include "ghosts.h"
 
 // Snake-0
 
@@ -20,26 +21,43 @@ void initialize() {
 	GMB_initialize();
 }
 
+	Pacman pacman = {MOVES_RIGHT, {10, 10}, ALIVE, 3, 0, BODY2};
+	Ghost ghosts[GHOSTS_NB] = { 
+	    {0, MOVES_LEFT, {GHOST1_SPAWN_X, GHOST1_SPAWN_Y}, GHOST_NORMAL}, 
+	    {1, MOVES_UP, {GHOST2_SPAWN_X, GHOST2_SPAWN_Y}, GHOST_NORMAL}, 
+	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
+
 void play() {
-	Pacman pacman = {MOVES_RIGHT, {10, 10}, ALIVE, 3, 0, PACMAN_BODY2};
 	unsigned char *keyboard = (unsigned char __xdata *) 0x3000;
 	Arrow arrow;
 	Status status;
 
 	GMB_draw(SNAKE_LIMIT_X0, SNAKE_LIMIT_Y0, SNAKE_LIMIT_X1, SNAKE_LIMIT_Y1);
-	
+	/* Draw the level */
+	GMB_drawLevel();
+	/* Place the ghosts */
+	Ghost_PlaceAll(ghosts);
 	/* Place powerups */
 	
+   
 	do {
 		arrow = KEYBOARD_readArrows(keyboard);
 	        status = Pacman_iterate(&pacman, arrow);
 		if (status == DEAD) {
-			/* Restart */
-			pacman.livesLeft--;
-		}		
+		   /* Restart */		
+		   GMB_display(6, 5, "You died!");
+		   pacman.livesLeft--;
+		   
+		} else {
+		    Ghost_Iterate(ghosts);
+		}
 		pause(20000);
 	} while (pacman.livesLeft > 0);
 	GMB_display(3, 7, " Game Over!");
+}
+
+void EventGhostDies(unsigned char ghostCharacter) {
+   Ghost_Dies(ghosts, ghostCharacter);
 }
 
 void main(void) {
@@ -57,10 +75,9 @@ void main(void) {
 	STDIO_initialize();
 
 	testsInError += testBuffer();
-	testsInError += testSnake();
 	testsInError += testKeyboard();
-	testsInError += testFruit();
 	testsInError += testGameboard();
+   
 
 	printf("%d tests en erreur", testsInError);
 

@@ -5,6 +5,11 @@
 #include "keyboard.h"
 
 typedef enum {
+   BODY1,
+   BODY2
+} BodyType;
+
+typedef enum {
 	MOVES_UP,
 	MOVES_DOWN,
 	MOVES_LEFT,
@@ -24,7 +29,7 @@ typedef struct {
 	Status status;
 	unsigned char livesLeft;
 	unsigned int points;
-	unsigned char lastHeadCharacter;
+	BodyType lastBody;
 } Pacman;
 
 Status Pacman_iterate(Pacman *pacman, Arrow arrow);

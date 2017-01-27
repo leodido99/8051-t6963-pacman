@@ -11,8 +11,6 @@ typedef struct {
 	unsigned char y;
 } Position;
 
-typedef int bool;
-#define true 1
-#define false 
+void EventGhostDies(unsigned char ghostCharacter);
 
 #endif
