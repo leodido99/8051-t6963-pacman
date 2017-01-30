@@ -44,6 +44,10 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 15, GHOST2_WEAK);
 	GMB_copyFromRomToCg( 14, GHOST3_NORMAL);
 	GMB_copyFromRomToCg( 15, GHOST3_WEAK);
+	
+	GMB_copyFromRomToCg( 0, COIN_SMALL);
+	GMB_copyFromRomToCg( 1, COIN_LARGE);
+	GMB_copyFromRomToCg( 2, CHERRY);
 }
 
 /**

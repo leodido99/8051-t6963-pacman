@@ -6,8 +6,7 @@
 #include "keyboard.h"
 #include "gameboard.h"
 #include "ghosts.h"
-
-// Snake-0
+#include "cherry.h"
 
 #ifndef TEST
 
@@ -28,17 +27,21 @@ void initialize() {
 	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
 
 void play() {
+	 unsigned char iterate_ghost = 1;
 	unsigned char *keyboard = (unsigned char __xdata *) 0x3000;
 	Arrow arrow;
 	Status status;
 
-	GMB_draw(SNAKE_LIMIT_X0, SNAKE_LIMIT_Y0, SNAKE_LIMIT_X1, SNAKE_LIMIT_Y1);
+	GMB_draw(PACMAN_LIMIT_X0, PACMAN_LIMIT_Y0, PACMAN_LIMIT_X1, PACMAN_LIMIT_Y1);
 	/* Draw the level */
 	GMB_drawLevel();
 	/* Place the ghosts */
 	Ghost_PlaceAll(ghosts);
 	/* Place powerups */
-	
+   
+   
+   
+	Cherry_Place();
    
 	do {
 		arrow = KEYBOARD_readArrows(keyboard);
@@ -49,9 +52,12 @@ void play() {
 		   pacman.livesLeft--;
 		   
 		} else {
-		    Ghost_Iterate(ghosts);
+		   if (iterate_ghost) {
+		     Ghost_Iterate(ghosts);  
+		   }
+		   iterate_ghost ^= 1;
 		}
-		pause(20000);
+		pause(15000);
 	} while (pacman.livesLeft > 0);
 	GMB_display(3, 7, " Game Over!");
 }

@@ -8,7 +8,6 @@ int testGameboard();
 #define CHAR_BASE 0x80
 #endif
 
-
 #define EMPTY 0x00
 
 #define PACMAN_UP_BODY1 (0x11 + CHAR_BASE)

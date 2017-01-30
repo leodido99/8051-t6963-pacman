@@ -84,7 +84,7 @@ void Pacman_liveOrDie(Pacman *pacman) {
       case GHOST3_WEAK:
 	 /* Dead ghost */
 	 EventGhostDies(charAtPosition);
-	 pacman->points += GHOST_POINTS;	 
+	 pacman->points += GHOST_POINTS; 
       case GHOST1_NORMAL:
       case GHOST2_NORMAL:
       case GHOST3_NORMAL:
