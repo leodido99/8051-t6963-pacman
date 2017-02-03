@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "keyboard.h"
+#include "bdd.h"
 
 typedef enum {
    BODY1,
@@ -38,5 +39,8 @@ void Pacman_turn(Pacman *pacman, Arrow arrow);
 void Pacman_showHead(Pacman *pacman);
 void Pacman_liveOrDie(Pacman *pacman);
 
+#ifdef TEST
+int testPacman();
+#endif
 
 #endif

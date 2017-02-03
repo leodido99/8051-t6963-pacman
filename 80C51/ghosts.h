@@ -4,11 +4,11 @@
 #include "pacman.h"
 
 #define GHOST1_SPAWN_X 1
-#define GHOST1_SPAWN_Y 1
+#define GHOST1_SPAWN_Y 2
 #define GHOST2_SPAWN_X 3
-#define GHOST2_SPAWN_Y 1
+#define GHOST2_SPAWN_Y 2
 #define GHOST3_SPAWN_X 5
-#define GHOST3_SPAWN_Y 1
+#define GHOST3_SPAWN_Y 2
 
 typedef enum {
    GHOST_NORMAL,
@@ -28,5 +28,6 @@ typedef struct {
 void Ghost_Dies(Ghost *ghosts, unsigned char ghostChar);
 void Ghost_PlaceAll(Ghost *ghosts);
 void Ghost_Iterate(Ghost *ghosts);
+void Ghost_SetStatus(Ghost *ghost, unsigned int weak);
 
 #endif

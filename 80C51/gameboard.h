@@ -38,6 +38,8 @@ int testGameboard();
 #define GHOST3_NORMAL (0x27 + CHAR_BASE)
 #define GHOST3_WEAK (0x28 + CHAR_BASE)
 
+#define HEART (0x29 + CHAR_BASE)
+
 #define COIN_SMALL_POINTS 1
 #define COIN_LARGE_POINTS 5
 #define CHERRY_POINTS 10

@@ -48,6 +48,7 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 0, COIN_SMALL);
 	GMB_copyFromRomToCg( 1, COIN_LARGE);
 	GMB_copyFromRomToCg( 2, CHERRY);
+	GMB_copyFromRomToCg( 14, HEART);
 }
 
 /**
@@ -202,8 +203,8 @@ int testGameboard() {
 	int testsInError = 0;
 
 	testsInError += bddGameboardDraw();
-	testsInError += bddGameboardClear();
-	testsInError += bddGameboardDisplay();
+	//testsInError += bddGameboardClear();
+	//testsInError += bddGameboardDisplay();
 
 	return testsInError;
 }

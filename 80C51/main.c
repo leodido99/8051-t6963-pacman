@@ -7,6 +7,7 @@
 #include "gameboard.h"
 #include "ghosts.h"
 #include "cherry.h"
+#include "t6963c.h"
 
 #ifndef TEST
 
@@ -27,16 +28,37 @@ void initialize() {
 	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
 
 unsigned char game_end = 0, game_paused = 0;
+
+#define HUD_LIFE_X 0
+#define HUD_LIFE_Y 0
+
+void displayLives(Pacman *pacman) {
+   unsigned int i;
+   for(i = 0; i < pacman->livesLeft; i++) {
+      T6963C_writeAt(HUD_LIFE_X + i, HUD_LIFE_Y, HEART);   
+   }   
+}
+
+void displayPoints(unsigned int points) {
+   /* TODO */
+}
+
+void displayHUD(Pacman *pacman) {
+   displayLives(pacman);
+   displayPoints(pacman->points);
+}
 	    
 /**
  * Initialize the game board
  */	    
-void initGameBoard(void) {
+void initGameBoard(Pacman* pacman) {
         /* Clear the board */
-	GMB_clear(PACMAN_LIMIT_X0, PACMAN_LIMIT_Y0, PACMAN_LIMIT_X1, PACMAN_LIMIT_Y1);
+	GMB_clear(SCREEN_LIMIT_X0, SCREEN_LIMIT_Y0, SCREEN_LIMIT_X1, SCREEN_LIMIT_Y1);
 	GMB_draw(PACMAN_LIMIT_X0, PACMAN_LIMIT_Y0, PACMAN_LIMIT_X1, PACMAN_LIMIT_Y1);
 	/* Draw the level */
 	GMB_drawLevel();
+	/* Draw HUD */
+	displayHUD(pacman);
 }   
 	
 /**
@@ -90,12 +112,11 @@ void play() {
 	Status status;
 
 	/* Initialize the game board */
-	initGameBoard();
+	initGameBoard(&pacman);
 	/* Initialize the pacman */
 	initPacman(&pacman);
         /* Initialize the ghosts */
 	initGhosts(ghosts);
-   
    
 	Cherry_Place();
    
@@ -120,20 +141,14 @@ void play() {
 		   if (arrow != ARROW_NEUTRAL) {
 		      /* Player touched a key */
 		      /* Initialize the game board */
-		      initGameBoard();
+		      initGameBoard(&pacman);
 		      /* Initialize the pacman */
 		      initPacman(&pacman);
 		      /* Initialize the ghosts */
 		      initGhosts(ghosts); 
 		      game_paused = 0;
 		   }
-		   
-		   
 		}
-	   
-	   
-	   
-
 		pause(15000);
 	} while (game_end == 0);
 	GMB_display(3, 7, " Game Over!");
@@ -141,6 +156,13 @@ void play() {
 
 void EventGhostDies(unsigned char ghostCharacter) {
    Ghost_Dies(ghosts, ghostCharacter);
+}
+
+void EventGhostsWeak(void) {
+   Ghost_SetStatus(&ghosts[0], 1);
+   Ghost_SetStatus(&ghosts[1], 1);
+   Ghost_SetStatus(&ghosts[2], 1);
+   /* TODO Set timer and put back ghosts to normal after a while */
 }
 
 void main(void) {
@@ -153,14 +175,26 @@ void main(void) {
 
 #else
 #include <stdio.h>
+#include "ghosts.h"
+
+Ghost ghosts[GHOSTS_NB];
+
+void EventGhostDies(unsigned char ghostCharacter) {
+   return;
+}
+
+void EventGhostsWeak(void) {
+   return;
+}
+
 void main(void) {
 	int testsInError = 0;
 	STDIO_initialize();
 
-	testsInError += testBuffer();
-	testsInError += testKeyboard();
-	testsInError += testGameboard();
-   
+	//testsInError += testBuffer();
+	//testsInError += testKeyboard();
+	//testsInError += testGameboard();
+	 testsInError += testPacman();
 
 	printf("%d tests en erreur", testsInError);
 
