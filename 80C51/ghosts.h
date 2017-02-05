@@ -3,12 +3,12 @@
 
 #include "pacman.h"
 
-#define GHOST1_SPAWN_X 1
-#define GHOST1_SPAWN_Y 1
+#define GHOST1_SPAWN_X 3
+#define GHOST1_SPAWN_Y 2
 #define GHOST2_SPAWN_X 3
-#define GHOST2_SPAWN_Y 1
-#define GHOST3_SPAWN_X 5
-#define GHOST3_SPAWN_Y 1
+#define GHOST2_SPAWN_Y 2
+#define GHOST3_SPAWN_X 3
+#define GHOST3_SPAWN_Y 2
 
 typedef enum {
    GHOST_NORMAL,
