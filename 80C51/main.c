@@ -8,6 +8,7 @@
 #include "ghosts.h"
 #include "cherry.h"
 #include "t6963c.h"
+#include <stdio.h>
 
 #ifndef TEST
 
@@ -27,8 +28,9 @@ void initialize() {
 	    {1, MOVES_UP, {GHOST2_SPAWN_X, GHOST2_SPAWN_Y}, GHOST_NORMAL}, 
 	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
 
-unsigned char game_end = 0, game_paused = 0, weak_ghost_iter = 0;
-
+unsigned char game_end = 0, game_paused = 0;
+unsigned int weak_ghost_iter = 0;
+	    
 #define HUD_LIFE_X 0
 #define HUD_LIFE_Y 0
 	    
@@ -49,6 +51,9 @@ void displayLives(Pacman *pacman) {
 }
 
 void displayPoints(unsigned int points) {
+   char tmp[20];
+   sprintf(tmp, "%d", points);
+   /* Use gameboard function to print text */
    /* TODO */
 }
 
@@ -136,8 +141,6 @@ void play() {
 		  if (status == DEAD) {
 		     /* Player died */
 		     handlePlayerDeath(&pacman);
-		     
-		     
 		  }
 		  /* Only iterate the ghost once for two iteration
 		     Otherwise the ghosts are moving too fast */
@@ -173,12 +176,18 @@ void play() {
 	GMB_display(3, 7, " Game Over!");
 }
 
+/**
+ * Event triggered when a ghost dies
+ */
 void EventGhostDies(unsigned char ghostCharacter) {
    Ghost_Dies(ghosts, ghostCharacter);
 }
 
-#define WEAK_GHOST_NB_ITER 50
+#define WEAK_GHOST_NB_ITER 500
 
+/**
+ * Event triggered when ghosts become weak
+ */
 void EventGhostsWeak(void) {
    setGhostStatus(1);
    weak_ghost_iter = WEAK_GHOST_NB_ITER;
@@ -214,6 +223,7 @@ void main(void) {
 	//testsInError += testKeyboard();
 	//testsInError += testGameboard();
 	 testsInError += testPacman();
+	 testsInError += testGhost();
 
 	printf("%d tests en erreur", testsInError);
 

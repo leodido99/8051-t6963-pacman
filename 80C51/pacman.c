@@ -3,6 +3,7 @@
 #include "t6963c.h"
 #include "ghosts.h"
 #include "buffer.h"
+#include "cherry.h"
 
 #ifdef TEST
 #include "test.h"
@@ -82,6 +83,7 @@ void Pacman_liveOrDie(Pacman *pacman) {
 	 break;
       case CHERRY:
 	 pacman->points += CHERRY_POINTS;
+	 Cherry_Place();
 	 break;
       case GHOST1_WEAK:
       case GHOST2_WEAK:

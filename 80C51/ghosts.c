@@ -3,6 +3,7 @@
 #include "t6963c.h"
 #include "gameboard.h"
 #include <stdlib.h>
+#include "test.h"
 
 /**
  * Returns the ghost character from an index and status
@@ -129,10 +130,11 @@ Direction GetFreeDirection(Ghost *ghost) {
       move_possible = GMB_MovePossible(new_x, new_y);
       if (move_possible == 0) {
 	 /* Move impossible */
-	 new_direction++;
-	 if (new_direction > MOVES_RIGHT) {
-	    new_direction = MOVES_UP;
-	 }
+	 new_direction = GetRandomDirection();
+	 //new_direction++;
+	 //if (new_direction > MOVES_RIGHT) {
+	 //   new_direction = MOVES_UP;
+	 //}
       }
    } while(move_possible == 0);
    return new_direction;
@@ -159,6 +161,9 @@ unsigned char charIsGhost(unsigned char character) {
    return isGhost;
 }
 
+/*
+ * Returns 1 if the ghost can move to this position, 0 otherwise
+ */
 unsigned char Ghost_CanMove(unsigned char new_x, unsigned char new_y) {
    unsigned char charAtPos = T6963C_readFrom(new_x, new_y);
    unsigned char canMove = 0;
@@ -174,9 +179,11 @@ unsigned char Ghost_CanMove(unsigned char new_x, unsigned char new_y) {
  */
 unsigned char RandomDirectionChange(void) {
    unsigned char direction_change = 0;
- 
- 
- 
+   int randVal;
+   randVal = rand();
+   if (randVal % 2 == 0) {
+      direction_change = 1;
+   }
    return direction_change;
 }
 
@@ -238,9 +245,119 @@ void Ghost_Iterate(Ghost *ghosts) {
    }
 }
 
+/*
+ * The ghost specified by ghostChar died
+ */
 void Ghost_Dies(Ghost *ghosts, unsigned char ghostChar) {
    unsigned char idx = GetIndexFromCharacter(ghostChar);
    if (idx <= (GHOSTS_NB-1)) {
       ghosts[idx].status = GHOST_DEAD;  
    }
 }
+
+#ifdef TEST
+
+int testGhostMoves() {
+   int testsInError = 0;
+   
+   Ghost ghost;
+   
+   ghost.position.x = 10;
+   ghost.position.y = 10;
+   ghost.direction = MOVES_RIGHT;
+   Ghost_Move(&ghost);
+   testsInError += assertEquals(11, ghost.position.x, "GM001");
+   testsInError += assertEquals(10, ghost.position.y, "GM002");
+   
+   ghost.position.x = 10;
+   ghost.position.y = 10;
+   ghost.direction = MOVES_LEFT;
+   Ghost_Move(&ghost);
+   testsInError += assertEquals(9, ghost.position.x, "GM003");
+   testsInError += assertEquals(10, ghost.position.y, "GM004");   
+
+   ghost.position.x = 10;
+   ghost.position.y = 10;
+   ghost.direction = MOVES_UP;
+   Ghost_Move(&ghost);
+   testsInError += assertEquals(10, ghost.position.x, "GM005");
+   testsInError += assertEquals(9, ghost.position.y, "GM006");   
+
+   ghost.position.x = 10;
+   ghost.position.y = 10;
+   ghost.direction = MOVES_DOWN;
+   Ghost_Move(&ghost);
+   testsInError += assertEquals(10, ghost.position.x, "GM007");
+   testsInError += assertEquals(11, ghost.position.y, "GM008");
+
+   return testsInError;
+}
+
+int testGhostCanMove() {
+   int testsInError = 0;
+   
+   T6963C_writeAt(10, 10, OBSTACLE_LEFT_DOWN);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM001");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_LEFT_UP);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM001");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_RIGHT_DOWN);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM002");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_RIGHT_UP);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM003");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_VERTICAL);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM004");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_HORIZONTAL);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM005");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_VERTICAL_LEFT);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM006");
+
+   T6963C_writeAt(10, 10, OBSTACLE_VERTICAL_RIGHT);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM007");
+   
+   T6963C_writeAt(10, 10, OBSTACLE_HORIZONTAL_UP);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM008");
+
+   T6963C_writeAt(10, 10, OBSTACLE_HORIZONTAL_DOWN);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM009");
+ 
+   T6963C_writeAt(10, 10, GHOST1_NORMAL);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM010");
+   
+   T6963C_writeAt(10, 10, GHOST1_WEAK);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM011");
+
+    T6963C_writeAt(10, 10, GHOST2_NORMAL);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM012");
+   
+   T6963C_writeAt(10, 10, GHOST2_WEAK);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM013");
+ 
+   T6963C_writeAt(10, 10, GHOST3_NORMAL);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM014");
+   
+   T6963C_writeAt(10, 10, GHOST3_WEAK);
+   testsInError += assertEquals(0, Ghost_CanMove(10,10), "GCM015"); 
+   
+   return testsInError;
+}
+
+int testGhost() {
+   int testsInError = 0;
+   
+   //testsInError += testPacmanTurn();
+   testsInError += testGhostMoves();
+   testsInError += testGhostCanMove();
+   //testsInError += testPacmanEats();
+   //testsInError += testPacmanHitsABorder();
+   
+   
+   return testsInError;
+}
+
+#endif

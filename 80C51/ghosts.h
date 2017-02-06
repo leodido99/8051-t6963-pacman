@@ -31,4 +31,8 @@ void Ghost_Iterate(Ghost *ghosts);
 void Ghost_SetStatus(Ghost *ghost, unsigned int weak);
 unsigned int Ghost_GetStatus(Ghost *ghost);
 
+#ifdef TEST
+   int testGhost();
+#endif
+
 #endif
