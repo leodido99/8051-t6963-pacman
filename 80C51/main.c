@@ -21,13 +21,14 @@ void initialize() {
 	GMB_initialize();
 }
 
-	Pacman pacman = {MOVES_RIGHT, {10, 10}, ALIVE, 3, 0, BODY2};
-	Ghost ghosts[GHOSTS_NB] = { 
-	    {0, MOVES_LEFT, {GHOST1_SPAWN_X, GHOST1_SPAWN_Y}, GHOST_NORMAL}, 
-	    {1, MOVES_UP, {GHOST2_SPAWN_X, GHOST2_SPAWN_Y}, GHOST_NORMAL}, 
-	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
+Pacman pacman = {MOVES_RIGHT, {10, 10}, ALIVE, 3, 0, BODY2};
 
-unsigned char game_end = 0, game_paused = 0;
+Ghost ghosts[GHOSTS_NB] = { 
+   {0, MOVES_LEFT, {GHOST1_SPAWN_X, GHOST1_SPAWN_Y}, GHOST_NORMAL},
+   {1, MOVES_UP, {GHOST2_SPAWN_X, GHOST2_SPAWN_Y}, GHOST_NORMAL}, 
+   {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
+
+unsigned char game_end = 0, game_paused = 0, weak_ghost_iter = 0;
 
 #define HUD_LIFE_X 0
 #define HUD_LIFE_Y 0
@@ -105,6 +106,15 @@ void handlePlayerDeath(Pacman *pacman) {
    }
 }
 
+/**
+ * Set the status of all the ghosts
+ */
+void setGhostStatus(unsigned int weak) {
+   Ghost_SetStatus(&ghosts[0], weak);
+   Ghost_SetStatus(&ghosts[1], weak);
+   Ghost_SetStatus(&ghosts[2], weak);
+}
+
 void play() {
 	unsigned char iterate_ghost = 1;
 	unsigned char *keyboard = (unsigned char __xdata *) 0x3000;
@@ -123,19 +133,28 @@ void play() {
 	do {
 		arrow = KEYBOARD_readArrows(keyboard);
 	        if (game_paused == 0) {
+		  /* Game Running */
 		  status = Pacman_iterate(&pacman, arrow);
 		  if (status == DEAD) {
 		     /* Player died */
 		     handlePlayerDeath(&pacman);
-		     
-		     
-		  }
-		  /* Only iterate the ghost once for two iteration
+		  } else {
+		     /* Only iterate the ghost once for two iteration
 		     Otherwise the ghosts are moving too fast */
-		  if (iterate_ghost) {
-		     Ghost_Iterate(ghosts);  
+		     if (iterate_ghost) {
+			Ghost_Iterate(ghosts);  
+		     }
+		     iterate_ghost ^= 1;   
 		  }
-		  iterate_ghost ^= 1;
+		  /* Check if ghosts are weak */
+		  if (Ghost_GetStatus(&ghosts[0]) == 1) {
+		     if (weak_ghost_iter > 0) {
+			weak_ghost_iter--;
+		     } else {
+			/* We reached the number of weak ghost iterations */
+			setGhostStatus(0);
+		     }
+		  }
 		} else {
 		   /* Game is paused */
 		   if (arrow != ARROW_NEUTRAL) {
@@ -154,15 +173,22 @@ void play() {
 	GMB_display(3, 7, " Game Over!");
 }
 
+#define WEAK_GHOST_NB_ITER 50
+
+/**
+ * Event triggered when a ghost is eaten by pacman
+ */
 void EventGhostDies(unsigned char ghostCharacter) {
    Ghost_Dies(ghosts, ghostCharacter);
+   weak_ghost_iter = WEAK_GHOST_NB_ITER;
 }
 
+/** 
+ * Event triggered when pacman eats a large coin
+ * This makes all ghosts weak for a period of time
+ */
 void EventGhostsWeak(void) {
-   Ghost_SetStatus(&ghosts[0], 1);
-   Ghost_SetStatus(&ghosts[1], 1);
-   Ghost_SetStatus(&ghosts[2], 1);
-   /* TODO Set timer and put back ghosts to normal after a while */
+   setGhostStatus(1);
 }
 
 void main(void) {
