@@ -50,9 +50,10 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 15, GHOST1_WEAK);
    	GMB_copyFromRomToCg( 14, GHOST2_NORMAL);
 	GMB_copyFromRomToCg( 15, GHOST2_WEAK);
-	GMB_copyFromRomToCg( 20, GHOST3_NORMAL);
+	GMB_copyFromRomToCg( 14, GHOST3_NORMAL);
 	GMB_copyFromRomToCg( 15, GHOST3_WEAK);
 	
+	GMB_copyFromRomToCg( 20, HEART);
 	GMB_copyFromRomToCg( 21, CHERRY);
 	GMB_copyFromRomToCg( 22, COIN_LARGE);
 	GMB_copyFromRomToCg( 23, COIN_SMALL);
@@ -142,7 +143,9 @@ void GMB_drawLevel(void) {
    
    //GMB_drawSquare(6,2);
    
-   GMB_drawFigure(6,2,2,4);
+   
+   
+   //GMB_drawFigure(6,2,2,4);
    
    GMB_drawFigure(21,2,2,2);
    
@@ -163,6 +166,9 @@ void GMB_drawLevel(void) {
    T6963C_writeAt(2, 4, COIN_LARGE);
    
    T6963C_writeAt(2, 6, COIN_SMALL);
+   
+   T6963C_writeAt(10, 2, HEART);
+   
    
 }
 
@@ -241,6 +247,20 @@ void GMB_display(unsigned char x0, unsigned char y0, char *text) {
    
    GMB_draw(x0, y0, x1, y1);
 
+   for(n = 0; n < txt_size; n++) {
+	  T6963C_writeAt(x0 + 1 + n, y0 + 1, text[n] - 32); 
+   }
+   
+}
+
+
+void GMB_draw_text(unsigned char x0, unsigned char y0, char *text) {
+   unsigned char n;
+   unsigned char txt_size = strlen(text);
+  
+   unsigned char x1 = x0 + txt_size + 1;
+   unsigned char y1 = y0 + 2;
+   
    for(n = 0; n < txt_size; n++) {
 	  T6963C_writeAt(x0 + 1 + n, y0 + 1, text[n] - 32); 
    }
