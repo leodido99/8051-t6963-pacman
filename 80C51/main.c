@@ -27,10 +27,19 @@ void initialize() {
 	    {1, MOVES_UP, {GHOST2_SPAWN_X, GHOST2_SPAWN_Y}, GHOST_NORMAL}, 
 	    {2, MOVES_RIGHT, {GHOST3_SPAWN_X, GHOST3_SPAWN_Y}, GHOST_NORMAL} };
 
-unsigned char game_end = 0, game_paused = 0;
+unsigned char game_end = 0, game_paused = 0, weak_ghost_iter = 0;
 
 #define HUD_LIFE_X 0
 #define HUD_LIFE_Y 0
+	    
+/**
+ * Set the status of all the ghosts
+ */
+void setGhostStatus(unsigned int weak) {
+   Ghost_SetStatus(&ghosts[0], weak);
+   Ghost_SetStatus(&ghosts[1], weak);
+   Ghost_SetStatus(&ghosts[2], weak);
+}
 
 void displayLives(Pacman *pacman) {
    unsigned int i;
@@ -136,6 +145,16 @@ void play() {
 		     Ghost_Iterate(ghosts);  
 		  }
 		  iterate_ghost ^= 1;
+		  
+		  /* Check if ghosts are weak */
+		  if (Ghost_GetStatus(&ghosts[0]) == 1) {
+		     if (weak_ghost_iter > 0) {
+			weak_ghost_iter--;
+		     } else {
+			/* We reached the number of weak ghost iterations */
+			setGhostStatus(0);
+		     }
+		  }
 		} else {
 		   /* Game is paused */
 		   if (arrow != ARROW_NEUTRAL) {
@@ -158,11 +177,11 @@ void EventGhostDies(unsigned char ghostCharacter) {
    Ghost_Dies(ghosts, ghostCharacter);
 }
 
+#define WEAK_GHOST_NB_ITER 50
+
 void EventGhostsWeak(void) {
-   Ghost_SetStatus(&ghosts[0], 1);
-   Ghost_SetStatus(&ghosts[1], 1);
-   Ghost_SetStatus(&ghosts[2], 1);
-   /* TODO Set timer and put back ghosts to normal after a while */
+   setGhostStatus(1);
+   weak_ghost_iter = WEAK_GHOST_NB_ITER;
 }
 
 void main(void) {
