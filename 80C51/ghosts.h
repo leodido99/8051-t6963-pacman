@@ -28,5 +28,6 @@ typedef struct {
 void Ghost_Dies(Ghost *ghosts, unsigned char ghostChar);
 void Ghost_PlaceAll(Ghost *ghosts);
 void Ghost_Iterate(Ghost *ghosts);
+void Ghost_SetStatus(Ghost *ghost, unsigned int weak);
 
 #endif

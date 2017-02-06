@@ -1,3 +1,4 @@
+
 #include <string.h>
 #include "main.h"
 #include "t6963c.h"
@@ -93,9 +94,7 @@ unsigned char GMB_MovePossible(unsigned char x, unsigned y) {
  */
 
 
-void GMB_drawSquare_space(unsigned char x, unsigned char y) {
-   unsigned char i;
-   
+void GMB_drawSquare_space(unsigned char x, unsigned char y) {  
     T6963C_writeAt(x, y, OBSTACLE_LEFT_UP);
     
     T6963C_writeAt(x+2, y, OBSTACLE_RIGHT_UP);

@@ -149,7 +149,7 @@ void play() {
 		      game_paused = 0;
 		   }
 		}
-		pause(15000);
+		pause(12000);
 	} while (game_end == 0);
 	GMB_display(3, 7, " Game Over!");
 }

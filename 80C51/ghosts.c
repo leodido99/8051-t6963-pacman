@@ -71,6 +71,7 @@ void Ghost_Show(Ghost *ghost) {
    T6963C_writeAt(ghost->position.x, ghost->position.y, GetCharacterFromIndex(ghost->ghost_index, ghost->status));
 }
 
+
 void Ghost_SetStatus(Ghost *ghost, unsigned int weak) {
    unsigned int status = GHOST_NORMAL;
    if (weak == 1) {

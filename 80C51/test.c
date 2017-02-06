@@ -1,9 +1,9 @@
-#include <mcs51reg.h>
-#include <stdio.h>
 #include "test.h"
-#include "t6963c.h"
 
 #ifdef TEST
+#include <mcs51reg.h>
+#include <stdio.h>
+#include "t6963c.h"
 
 /**
  * Contrôle l'identité de deux valeurs, et signale un code
