@@ -93,6 +93,31 @@ unsigned char GMB_MovePossible(unsigned char x, unsigned y) {
  * Draws a square with empty spaces, give always left top postiton (x,y)
  */
 
+void GMB_drawFigure(unsigned char x, unsigned char y, unsigned char lenght, unsigned char height) {
+    unsigned char i;
+   
+    for(i = y+1; i < y+height; i++) {
+      T6963C_writeAt(x, i, OBSTACLE_VERTICAL_LEFT);
+    }    
+    T6963C_writeAt(x, y, OBSTACLE_LEFT_UP);
+    
+    for(i = x+1; i < x+lenght; i++) {
+      T6963C_writeAt(i, y, OBSTACLE_HORIZONTAL_UP);
+    }
+    T6963C_writeAt(x+lenght, y, OBSTACLE_RIGHT_UP);
+    
+    for(i = y+1; i < y+height; i++) {
+      T6963C_writeAt(x+lenght, i, OBSTACLE_VERTICAL_RIGHT);
+    }
+    
+    T6963C_writeAt(x+lenght, y+height, OBSTACLE_RIGHT_DOWN);
+    
+    for(i = x+1; i < x+lenght; i++) {
+      T6963C_writeAt(i, y+height, OBSTACLE_HORIZONTAL_DOWN);
+    }
+    T6963C_writeAt(x, y+height, OBSTACLE_LEFT_DOWN);
+}
+
 
 void GMB_drawSquare_space(unsigned char x, unsigned char y) {  
     T6963C_writeAt(x, y, OBSTACLE_LEFT_UP);
@@ -105,35 +130,8 @@ void GMB_drawSquare_space(unsigned char x, unsigned char y) {
 }
 
 /**
- * Draws a square, give always left top postiton (x,y)
+ * Draws a figure, give always the left top postiton (x,y) and also the leght and the height
  */
-
-
-void GMB_drawSquare(unsigned char x, unsigned char y) {
-    unsigned char i;
-   
-    for(i = y+1; i < y+2; i++) {
-      T6963C_writeAt(x, i, OBSTACLE_VERTICAL_LEFT);
-    }    
-    T6963C_writeAt(x, y, OBSTACLE_LEFT_UP);
-    
-    for(i = x+1; i < x+2; i++) {
-      T6963C_writeAt(i, y, OBSTACLE_HORIZONTAL_UP);
-    }
-    T6963C_writeAt(x+2, y, OBSTACLE_RIGHT_UP);
-    
-    for(i = y+1; i < y+2; i++) {
-      T6963C_writeAt(x+2, i, OBSTACLE_VERTICAL_RIGHT);
-    }
-    
-    T6963C_writeAt(x+2, y+2, OBSTACLE_RIGHT_DOWN);
-    
-    for(i = x+1; i < x+2; i++) {
-      T6963C_writeAt(i, y+2, OBSTACLE_HORIZONTAL_DOWN);
-    }
-    T6963C_writeAt(x, y+2, OBSTACLE_LEFT_DOWN);
-}
-
 
 /**
  * Draws the complete level on the display
@@ -142,12 +140,17 @@ void GMB_drawSquare(unsigned char x, unsigned char y) {
 void GMB_drawLevel(void) {
    unsigned char i;
    
-   GMB_drawSquare(6,2);
-   GMB_drawSquare(21,2);
+   //GMB_drawSquare(6,2);
    
-   GMB_drawSquare(6,11);
-   GMB_drawSquare(21,11);
+   GMB_drawFigure(6,2,2,4);
    
+   GMB_drawFigure(21,2,2,2);
+   
+   GMB_drawFigure(6,11,2,2);
+   
+   GMB_drawFigure(21,11,2,2);
+   
+  
    for(i = 8; i < 22; i++) {
       T6963C_writeAt(i, 8, OBSTACLE_HORIZONTAL);
    }
