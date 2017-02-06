@@ -71,6 +71,14 @@ void Ghost_Show(Ghost *ghost) {
    T6963C_writeAt(ghost->position.x, ghost->position.y, GetCharacterFromIndex(ghost->ghost_index, ghost->status));
 }
 
+void Ghost_SetStatus(Ghost *ghost, unsigned int weak) {
+   unsigned int status = GHOST_NORMAL;
+   if (weak == 1) {
+      status = GHOST_WEAK;
+   }   
+   ghost->status = status;
+}
+
 /**
  * Move the ghost
  */
@@ -179,10 +187,21 @@ void Ghost_Turn(Ghost *ghost) {
  * Reset the ghost status and position and draw it
  */
 void Ghost_Respawn(Ghost *ghost) {
-   ghost->position.x = GHOST1_SPAWN_X;
-   ghost->position.y = GHOST1_SPAWN_Y;
+   switch(ghost->ghost_index) {
+      case 0:
+	 ghost->position.x = GHOST1_SPAWN_X;
+	 ghost->position.y = GHOST1_SPAWN_Y;
+	 break;
+      case 1:
+	 ghost->position.x = GHOST2_SPAWN_X;
+	 ghost->position.y = GHOST2_SPAWN_Y;
+	 break;
+      case 2:
+	 ghost->position.x = GHOST3_SPAWN_X;
+	 ghost->position.y = GHOST3_SPAWN_Y;
+	 break;
+   }
    ghost->status = GHOST_NORMAL;
-   //Ghost_Show(ghost);
 }
 
 /*
