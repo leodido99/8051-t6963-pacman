@@ -4,6 +4,7 @@
 #include "t6963c.h"
 #include "bdd.h"
 #include "gameboard.h"
+#include "cherry.h"
 
 #define ROM_CG_ADDRESS 0x0000
 
@@ -42,9 +43,7 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 17, OBSTACLE_VERTICAL_RIGHT);
 	GMB_copyFromRomToCg( 18, OBSTACLE_HORIZONTAL_UP);
 	GMB_copyFromRomToCg( 19, OBSTACLE_HORIZONTAL_DOWN);
-    
-    
-	
+	GMB_copyFromRomToCg( 13, OBSTACLE_FILLER);
    
 	GMB_copyFromRomToCg( 14, GHOST1_NORMAL);
 	GMB_copyFromRomToCg( 15, GHOST1_WEAK);
@@ -57,14 +56,11 @@ void GMB_initialize() {
 	GMB_copyFromRomToCg( 21, CHERRY);
 	GMB_copyFromRomToCg( 22, COIN_LARGE);
 	GMB_copyFromRomToCg( 23, COIN_SMALL);
-
-	
-	
 }
 
 /**
  * Returns true if the provided position is free to move to
- * or false otherwise
+ * or false otherwise (no obstacle)
  */
 unsigned char GMB_MovePossible(unsigned char x, unsigned y) {
    unsigned char possibleMove;
@@ -119,57 +115,142 @@ void GMB_drawFigure(unsigned char x, unsigned char y, unsigned char lenght, unsi
     T6963C_writeAt(x, y+height, OBSTACLE_LEFT_DOWN);
 }
 
+/**
+ * Fill all empty spaces with small coins
+ */
+void GMB_filleWithCoins(void) {
+   unsigned char i, j, charAtPosition;
 
-void GMB_drawSquare_space(unsigned char x, unsigned char y) {  
+   for(i = PACMAN_LIMIT_X0 + 1; i < PACMAN_LIMIT_X1; i++) {
+       for(j = PACMAN_LIMIT_Y0 + 1; j < PACMAN_LIMIT_Y1; j++) {
+	 charAtPosition = T6963C_readFrom(i, j);
+	    if (charAtPosition == EMPTY) {
+	       T6963C_writeAt(i, j, COIN_SMALL);  
+	    }
+       }   
+   }
+}
+
+/** 
+ * Draws a square and fill it with a filler character
+ */
+void GMB_drawFilledSquare(unsigned char x, unsigned char y, unsigned char length, unsigned char height) {
+    unsigned char i, j;
+   
+    for(i = y+1; i < y+height; i++) {
+      T6963C_writeAt(x, i, OBSTACLE_VERTICAL_LEFT);
+    }    
     T6963C_writeAt(x, y, OBSTACLE_LEFT_UP);
     
-    T6963C_writeAt(x+2, y, OBSTACLE_RIGHT_UP);
+    for(i = x+1; i < x+length; i++) {
+      T6963C_writeAt(i, y, OBSTACLE_HORIZONTAL_UP);
+    }
+    T6963C_writeAt(x+length, y, OBSTACLE_RIGHT_UP);
     
-    T6963C_writeAt(x+2, y+2, OBSTACLE_RIGHT_DOWN);
+    for(i = y+1; i < y+height; i++) {
+      T6963C_writeAt(x+length, i, OBSTACLE_VERTICAL_RIGHT);
+    }
     
-    T6963C_writeAt(x, y+2, OBSTACLE_LEFT_DOWN);
+    T6963C_writeAt(x+length, y+height, OBSTACLE_RIGHT_DOWN);
+    
+    for(i = x+1; i < x+length; i++) {
+      T6963C_writeAt(i, y+height, OBSTACLE_HORIZONTAL_DOWN);
+    }
+    T6963C_writeAt(x, y+height, OBSTACLE_LEFT_DOWN);
+    
+    /* Fill square */
+    for(i = 1; i < length; i++) {
+       for(j = 1; j < height; j++) {
+	 T6963C_writeAt(x + i, y + j, OBSTACLE_FILLER);
+       }   
+    }
+}
+
+
+/**
+ * Draws an horizontal line
+ */
+void GMB_drawHorizontalLine(unsigned char x, unsigned char y, unsigned char length) {
+   unsigned char i;
+   for(i=0; i < length; i++) {
+      T6963C_writeAt(x + i, y, OBSTACLE_HORIZONTAL);  
+   }
 }
 
 /**
- * Draws a figure, give always the left top postiton (x,y) and also the leght and the height
+ * Draws an vertical line
  */
+void GMB_drawVerticalLine(unsigned char x, unsigned char y, unsigned char length) {
+   unsigned char i;
+   for(i=0; i < length; i++) {
+      T6963C_writeAt(x, y + i, OBSTACLE_VERTICAL);  
+   }
+}
 
 /**
  * Draws the complete level on the display
  */
-
 void GMB_drawLevel(void) {
-   unsigned char i;
+   /* Exit Screen Left */
+   T6963C_writeAt(SCREEN_LIMIT_X0,  GMB_MIDDLE_Y - 1, OBSTACLE_HORIZONTAL_UP);
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 1,  GMB_MIDDLE_Y - 1, OBSTACLE_HORIZONTAL_UP);
+   T6963C_writeAt(SCREEN_LIMIT_X0,  GMB_MIDDLE_Y, EMPTY);
+   T6963C_writeAt(SCREEN_LIMIT_X0,  GMB_MIDDLE_Y + 1, OBSTACLE_HORIZONTAL_DOWN);
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 1,  GMB_MIDDLE_Y + 1, OBSTACLE_HORIZONTAL_DOWN);
+      
+   /* Obstacles Left */
+   GMB_drawFilledSquare(SCREEN_LIMIT_X0 + 2, GMB_MIDDLE_Y - 5, 3, 2);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X0 + 2, GMB_MIDDLE_Y + 3, 3, 2);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X0 + 7, GMB_MIDDLE_Y - 5, 6);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X0 + 7, GMB_MIDDLE_Y + 5, 6);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X0 + 3, GMB_MIDDLE_Y - 1, 4);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X0 + 3, GMB_MIDDLE_Y + 1, 4);
+   GMB_drawVerticalLine(SCREEN_LIMIT_X0 + 8, GMB_MIDDLE_Y - 3, 7);
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 7,  GMB_MIDDLE_Y + 3, OBSTACLE_HORIZONTAL_DOWN);
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 7,  GMB_MIDDLE_Y - 3, OBSTACLE_HORIZONTAL_UP);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X0 + 10, GMB_MIDDLE_Y - 3, 2, 2);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X0 + 10, GMB_MIDDLE_Y + 1, 2, 2);
    
-   //GMB_drawSquare(6,2);
+   /* Exit Screen Right */
+   T6963C_writeAt(SCREEN_LIMIT_X1,  GMB_MIDDLE_Y - 1, OBSTACLE_HORIZONTAL_UP);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 1,  GMB_MIDDLE_Y - 1, OBSTACLE_HORIZONTAL_UP);
+   T6963C_writeAt(SCREEN_LIMIT_X1,  GMB_MIDDLE_Y, EMPTY);
+   T6963C_writeAt(SCREEN_LIMIT_X1,  GMB_MIDDLE_Y + 1, OBSTACLE_HORIZONTAL_DOWN);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 1,  GMB_MIDDLE_Y + 1, OBSTACLE_HORIZONTAL_DOWN);
    
+   /* Obstacles Left */
+   GMB_drawFilledSquare(SCREEN_LIMIT_X1 - 5, GMB_MIDDLE_Y - 5, 3, 2);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X1 - 5, GMB_MIDDLE_Y + 3, 3, 2);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X1 - 12, GMB_MIDDLE_Y - 5, 6);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X1 - 12, GMB_MIDDLE_Y + 5, 6);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X1 - 6, GMB_MIDDLE_Y - 1, 4);
+   GMB_drawHorizontalLine(SCREEN_LIMIT_X1 - 6, GMB_MIDDLE_Y + 1, 4);
+   GMB_drawVerticalLine(SCREEN_LIMIT_X1 - 8, GMB_MIDDLE_Y - 3, 7);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 7,  GMB_MIDDLE_Y + 3, OBSTACLE_HORIZONTAL_DOWN);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 7,  GMB_MIDDLE_Y - 3, OBSTACLE_HORIZONTAL_UP);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X1 - 12, GMB_MIDDLE_Y - 3, 2, 2);
+   GMB_drawFilledSquare(SCREEN_LIMIT_X1 - 12, GMB_MIDDLE_Y + 1, 2, 2);
+
+   /* Ghost Spawn */
+   T6963C_writeAt(GMB_MIDDLE_X - 1, GMB_MIDDLE_Y - 1, OBSTACLE_LEFT_UP);
+   T6963C_writeAt(GMB_MIDDLE_X, GMB_MIDDLE_Y - 1, OBSTACLE_RIGHT_UP);
+   T6963C_writeAt(GMB_MIDDLE_X, GMB_MIDDLE_Y + 1, OBSTACLE_RIGHT_DOWN); 
+   T6963C_writeAt(GMB_MIDDLE_X - 1, GMB_MIDDLE_Y + 1, OBSTACLE_LEFT_DOWN);
    
+   /* Obstacle Middle */
+   GMB_drawFilledSquare(GMB_MIDDLE_X - 1, SCREEN_LIMIT_Y0 + 3, 1, 2);
+   GMB_drawFilledSquare(GMB_MIDDLE_X - 1, SCREEN_LIMIT_Y1 - 4, 1, 2);
    
-   //GMB_drawFigure(6,2,2,4);
+   /* Powerups */
+   GMB_filleWithCoins();
    
-   GMB_drawFigure(21,2,2,2);
-   
-   GMB_drawFigure(6,11,2,2);
-   
-   GMB_drawFigure(21,11,2,2);
-   
-  
-   for(i = 8; i < 22; i++) {
-      T6963C_writeAt(i, 8, OBSTACLE_HORIZONTAL);
-   }
-   
-   GMB_drawSquare_space(14,2);
-   GMB_drawSquare_space(14,11);
-   
-   T6963C_writeAt(2, 2, CHERRY);
-   
-   T6963C_writeAt(2, 4, COIN_LARGE);
-   
-   T6963C_writeAt(2, 6, COIN_SMALL);
-   
-   T6963C_writeAt(10, 2, HEART);
-   
-   
+   /* Place large coins */
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 1, PACMAN_LIMIT_Y0 + 1, COIN_LARGE);
+   T6963C_writeAt(SCREEN_LIMIT_X0 + 1, PACMAN_LIMIT_Y1 - 1, COIN_LARGE);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 1, PACMAN_LIMIT_Y0 + 1, COIN_LARGE);
+   T6963C_writeAt(SCREEN_LIMIT_X1 - 1, PACMAN_LIMIT_Y1 - 1, COIN_LARGE);   
+   /* Place Cherry */
+   Cherry_Place();
 }
 
 /**
@@ -207,13 +288,6 @@ void GMB_draw(unsigned char x0, unsigned char y0, unsigned char x1, unsigned cha
    }
    T6963C_writeAt(x1, y1, OBSTACLE_RIGHT_DOWN);
    T6963C_writeAt(x0, y1, OBSTACLE_LEFT_DOWN);
-   
-    // Level 1  
-   //GMB_drawLevel_1();
-   
-   GMB_drawLevel();
-   
-   
 }
 
 /**
@@ -257,12 +331,9 @@ void GMB_display(unsigned char x0, unsigned char y0, char *text) {
 void GMB_draw_text(unsigned char x0, unsigned char y0, char *text) {
    unsigned char n;
    unsigned char txt_size = strlen(text);
-  
-   unsigned char x1 = x0 + txt_size + 1;
-   unsigned char y1 = y0 + 2;
-   
+
    for(n = 0; n < txt_size; n++) {
-	  T6963C_writeAt(x0 + 1 + n, y0 + 1, text[n] - 32); 
+	  T6963C_writeAt(x0 + 1 + n, y0, text[n] - 32); 
    }
    
 }

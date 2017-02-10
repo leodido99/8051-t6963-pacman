@@ -5,6 +5,9 @@
 #include "keyboard.h"
 #include "bdd.h"
 
+#define PACMAN_SPAWN_X GMB_MIDDLE_X
+#define PACMAN_SPAWN_Y PACMAN_LIMIT_Y1 - 1
+
 typedef enum {
    BODY1,
    BODY2
@@ -14,7 +17,8 @@ typedef enum {
 	MOVES_UP,
 	MOVES_DOWN,
 	MOVES_LEFT,
-	MOVES_RIGHT
+	MOVES_RIGHT,
+        MOVES_NEUTRAL
 } Direction;
 
 typedef enum {
@@ -33,6 +37,7 @@ typedef struct {
 	BodyType lastBody;
 } Pacman;
 
+void Pacman_Init(Pacman *pacman);
 Status Pacman_iterate(Pacman *pacman, Arrow arrow);
 void Pacman_move(Pacman *pacman);
 void Pacman_turn(Pacman *pacman, Arrow arrow);

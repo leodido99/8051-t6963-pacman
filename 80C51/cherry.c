@@ -20,14 +20,16 @@ void Cherry_GetRandomPosition(Position* position) {
  */
 void Cherry_PlaceInFreeSpace(Position* position) {
    unsigned char x = position->x, y = position->y;
+   unsigned char charAtPos = T6963C_readFrom(position->x, position->y);
    /* Loop until we find a free cell */
-   while(T6963C_readFrom(position->x, position->y) != EMPTY) {
+   while(charAtPos != EMPTY && charAtPos != COIN_SMALL) {
       /* Update position, if we have some room go right, otherwise reset to 0 */
       if (position->x <= PACMAN_LIMIT_X1) {
 	 position->x++;
       } else {
 	 position->x = PACMAN_LIMIT_X0;
       }
+      charAtPos = T6963C_readFrom(position->x, position->y);
    }
    /* Draw the cherry */
    T6963C_writeAt(position->x, position->y, CHERRY);

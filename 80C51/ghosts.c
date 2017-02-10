@@ -6,6 +6,50 @@
 #include "test.h"
 
 /**
+ * Returns 1 if the character is a ghost, 0 otherwise
+ */
+unsigned char charIsGhost(unsigned char character) {
+   unsigned char isGhost;
+   switch(character) {
+      case GHOST1_NORMAL:
+      case GHOST1_WEAK:
+      case GHOST2_NORMAL:
+      case GHOST2_WEAK:
+      case GHOST3_NORMAL:
+      case GHOST3_WEAK:	 
+	 isGhost = 1;
+	 break;
+      default:
+	 isGhost = 0;
+	 break;
+   }
+   return isGhost;
+}
+
+/**
+ * Returns 1 if the character is a pacman, 0 otherwise
+ */
+unsigned char charIsPacman(unsigned char character) {
+   unsigned char isGhost;
+   switch(character) {
+      case PACMAN_UP_BODY1:
+      case PACMAN_UP_BODY2:
+      case PACMAN_DOWN_BODY1:
+      case PACMAN_DOWN_BODY2:
+      case PACMAN_LEFT_BODY1:
+      case PACMAN_LEFT_BODY2:
+      case PACMAN_RIGHT_BODY1:
+      case PACMAN_RIGHT_BODY2:	 
+	 isGhost = 1;
+	 break;
+      default:
+	 isGhost = 0;
+	 break;
+   }
+   return isGhost;
+}
+
+/**
  * Returns the ghost character from an index and status
  */
 unsigned char GetCharacterFromIndex(unsigned char index, GhostStatus status) {
@@ -67,9 +111,18 @@ void Ghost_GetNewPosition(Direction direction, unsigned char* new_x, unsigned ch
 /**
  * Display the ghost
  */
-void Ghost_Show(Ghost *ghost) {
+void Ghost_Show(unsigned char idx, Ghost *ghosts) {
+   /* Save whatever is at the ghost position */
+   ghosts[idx].prevChar = T6963C_readFrom(ghosts[idx].position.x, ghosts[idx].position.y);
+   if (charIsGhost(ghosts[idx].prevChar) == 1) {
+      /* Previous char is a ghost */
+      ghosts[idx].prevChar = ghosts[GetIndexFromCharacter(ghosts[idx].prevChar)].prevChar;
+   } else if (charIsPacman(ghosts[idx].prevChar) == 1) {
+      /* Previous char is a pacman*/
+      ghosts[idx].prevChar = EMPTY;
+   }
    /* Draw ghost */
-   T6963C_writeAt(ghost->position.x, ghost->position.y, GetCharacterFromIndex(ghost->ghost_index, ghost->status));
+   T6963C_writeAt(ghosts[idx].position.x, ghosts[idx].position.y, GetCharacterFromIndex(ghosts[idx].ghost_index, ghosts[idx].status));
 }
 
 /** 
@@ -100,8 +153,8 @@ void Ghost_SetStatus(Ghost *ghost, unsigned int weak) {
 void Ghost_Move(Ghost *ghost) {
    unsigned char new_x = ghost->position.x, new_y = ghost->position.y;
    Ghost_GetNewPosition(ghost->direction, &new_x, &new_y);
-   /* Clear old ghost */
-   T6963C_writeAt(ghost->position.x, ghost->position.y, EMPTY);
+   /* Clear old ghost, write back old char */
+   T6963C_writeAt(ghost->position.x, ghost->position.y, ghost->prevChar);
    ghost->position.x = new_x;
    ghost->position.y = new_y;
 }
@@ -119,9 +172,8 @@ Direction GetRandomDirection(void) {
  * Returns a direction which a ghost is free to move to
  */
 Direction GetFreeDirection(Ghost *ghost) {
-   Direction new_direction = ghost->direction;
+   Direction new_direction = GetRandomDirection();
    unsigned char move_possible, new_x, new_y;
-   
    do {
       /* Get the next position with the current direction */
       new_x = ghost->position.x;
@@ -131,34 +183,9 @@ Direction GetFreeDirection(Ghost *ghost) {
       if (move_possible == 0) {
 	 /* Move impossible */
 	 new_direction = GetRandomDirection();
-	 //new_direction++;
-	 //if (new_direction > MOVES_RIGHT) {
-	 //   new_direction = MOVES_UP;
-	 //}
       }
    } while(move_possible == 0);
    return new_direction;
-}
-
-/**
- * Returns 1 if the character is a ghost, 0 otherwise
- */
-unsigned char charIsGhost(unsigned char character) {
-   unsigned char isGhost;
-   switch(character) {
-      case GHOST1_NORMAL:
-      case GHOST1_WEAK:
-      case GHOST2_NORMAL:
-      case GHOST2_WEAK:
-      case GHOST3_NORMAL:
-      case GHOST3_WEAK:	 
-	 isGhost = 1;
-	 break;
-      default:
-	 isGhost = 0;
-	 break;
-   }
-   return isGhost;
 }
 
 /*
@@ -174,18 +201,8 @@ unsigned char Ghost_CanMove(unsigned char new_x, unsigned char new_y) {
    return canMove;
 }
 
-/**
- * Decides if it is time to randomly change direction
- */
-unsigned char RandomDirectionChange(void) {
-   unsigned char direction_change = 0;
-   int randVal;
-   randVal = rand();
-   if (randVal % 2 == 0) {
-      direction_change = 1;
-   }
-   return direction_change;
-}
+/* Counters for the ghost going in the same direction */
+unsigned int ghost_same_dir[3] = { 0,0,0 };
 
 /**
  * Modifies the direction of the ghost if required
@@ -196,11 +213,19 @@ void Ghost_Turn(Ghost *ghost) {
    unsigned char new_x = ghost->position.x, new_y = ghost->position.y;
    /* Get the next position */
    Ghost_GetNewPosition(ghost->direction, &new_x, &new_y);
-   if (GMB_MovePossible(new_x, new_y) == 0 || RandomDirectionChange() == 1) {
+   if (GMB_MovePossible(new_x, new_y) == 0) {
       /* We cannot go to the next position, 
          in all cases we have to change it. 
          Or it is time to randomly change direction */
       ghost->direction = GetFreeDirection(ghost);
+      ghost_same_dir[ghost->ghost_index] = 0;
+   } else {
+      ghost_same_dir[ghost->ghost_index]++;
+      /* If we go in a single direction for a long time, randomly change it */
+      if (ghost_same_dir[ghost->ghost_index] >= 8) {
+	 ghost_same_dir[ghost->ghost_index] = 0;
+	 ghost->direction = GetFreeDirection(ghost);
+      }
    }
 }
 
@@ -241,7 +266,7 @@ void Ghost_Iterate(Ghost *ghosts) {
 	 Ghost_Respawn(&ghosts[i]);
       }
       /* Show the ghost */
-      Ghost_Show(&ghosts[i]);
+      Ghost_Show(i,ghosts);
    }
 }
 
@@ -290,6 +315,43 @@ int testGhostMoves() {
    testsInError += assertEquals(10, ghost.position.x, "GM007");
    testsInError += assertEquals(11, ghost.position.y, "GM008");
 
+   return testsInError;
+}
+
+int testGhostStatus() {
+   int testsInError = 0;
+   
+   Ghost ghost;
+   Ghost_SetStatus(&ghost, 0);
+   testsInError += assertEquals(0, Ghost_GetStatus(&ghost), "GS001");
+
+   Ghost_SetStatus(&ghost, 1);   
+   testsInError += assertEquals(1, Ghost_GetStatus(&ghost), "GS002");
+   
+   return testsInError;
+}
+
+
+int testGhostShow() {
+   int testsInError = 0;
+   
+   Ghost ghost[2];
+   ghost[0].position.x = 0;
+   ghost[0].position.y = 0;
+   ghost[1].prevChar = COIN_LARGE;
+   
+   T6963C_writeAt(ghost[0].position.x, ghost[0].position.y, GHOST2_NORMAL);
+   Ghost_Show(0, ghost);
+   testsInError += assertEquals(COIN_LARGE, ghost[0].prevChar, "GSH001");
+   
+   T6963C_writeAt(ghost[0].position.x, ghost[0].position.y, PACMAN_UP_BODY1);
+   Ghost_Show(0, ghost);
+   testsInError += assertEquals(EMPTY, ghost[0].prevChar, "GSH002");
+   
+   T6963C_writeAt(ghost[0].position.x, ghost[0].position.y, COIN_SMALL);
+   Ghost_Show(0, ghost);
+   testsInError += assertEquals(COIN_SMALL, ghost[0].prevChar, "GSH003");  
+   
    return testsInError;
 }
 
@@ -350,12 +412,10 @@ int testGhostCanMove() {
 int testGhost() {
    int testsInError = 0;
    
-   //testsInError += testPacmanTurn();
    testsInError += testGhostMoves();
    testsInError += testGhostCanMove();
-   //testsInError += testPacmanEats();
-   //testsInError += testPacmanHitsABorder();
-   
+   testsInError += testGhostStatus();
+   testsInError += testGhostShow();
    
    return testsInError;
 }

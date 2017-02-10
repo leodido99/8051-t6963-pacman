@@ -2,13 +2,14 @@
 #define ___GHOSTS_H
 
 #include "pacman.h"
+#include "ghosts.h"
 
-#define GHOST1_SPAWN_X 3
-#define GHOST1_SPAWN_Y 2
-#define GHOST2_SPAWN_X 3
-#define GHOST2_SPAWN_Y 2
-#define GHOST3_SPAWN_X 3
-#define GHOST3_SPAWN_Y 2
+#define GHOST1_SPAWN_X GMB_MIDDLE_X - 2
+#define GHOST1_SPAWN_Y GMB_MIDDLE_Y - 1
+#define GHOST2_SPAWN_X GMB_MIDDLE_X + 1
+#define GHOST2_SPAWN_Y GMB_MIDDLE_Y - 1
+#define GHOST3_SPAWN_X GMB_MIDDLE_X
+#define GHOST3_SPAWN_Y GMB_MIDDLE_Y
 
 typedef enum {
    GHOST_NORMAL,
@@ -21,6 +22,7 @@ typedef struct {
   Direction direction;
   Position position;
   GhostStatus status;
+  unsigned char prevChar;
 } Ghost;
 
 #define GHOSTS_NB 3

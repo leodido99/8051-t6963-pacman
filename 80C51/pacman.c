@@ -12,6 +12,42 @@
 /* Used to know if the pacman must be erased this iteration */
 unsigned char g_erase_pacman = 0;
 
+/* Initialize the pacman structure */
+void Pacman_Init(Pacman *pacman) {
+   g_erase_pacman = 0;
+   pacman->direction = MOVES_NEUTRAL;
+   pacman->position.x = PACMAN_SPAWN_X;
+   pacman->position.y = PACMAN_SPAWN_Y;
+   pacman->status = ALIVE;
+   pacman->lastBody = BODY2;
+}
+
+unsigned char Pacman_MovePossible(unsigned char x, unsigned y) {
+   unsigned char possibleMove;
+   unsigned char charAtPosition = T6963C_readFrom(x, y);
+   switch(charAtPosition) {
+      case OBSTACLE_LEFT_DOWN:
+      case OBSTACLE_LEFT_UP:
+      case OBSTACLE_RIGHT_DOWN:
+      case OBSTACLE_RIGHT_UP:
+      case OBSTACLE_VERTICAL:
+      case OBSTACLE_VERTICAL_LEFT:
+      case OBSTACLE_VERTICAL_RIGHT:
+      case OBSTACLE_HORIZONTAL:
+      case OBSTACLE_HORIZONTAL_UP:
+      case OBSTACLE_HORIZONTAL_DOWN:
+      case GHOST1_NORMAL:
+      case GHOST2_NORMAL:
+      case GHOST3_NORMAL:	 
+	 possibleMove = 0;
+	 break;
+      default:
+	 possibleMove = 1;
+	 break;
+   }
+   return possibleMove;
+}
+
 /**
  * Modifie les coordonnées du pacman selon sa direction.
  * @param pacman La description du pacman.
@@ -26,12 +62,22 @@ void Pacman_move(Pacman *pacman) {
 	 new_y--;
 	 break;      
       case MOVES_LEFT:
-	 new_x--;
+	 if (new_x == PACMAN_LIMIT_X0) {
+	    /* Leaving screen */
+	    new_x = PACMAN_LIMIT_X1;
+	 } else {
+	    new_x--;
+	 }
 	 break;
       case MOVES_RIGHT:
-	 new_x++;
-	 break;       
+	 if (new_x == PACMAN_LIMIT_X1) {
+	    new_x = PACMAN_LIMIT_X0;
+	 } else {
+	    new_x++;
+	 }
+	 break;
    }
+   
    /* Only move if it is possible */
    if (GMB_MovePossible(new_x, new_y) == 1) {
       /* Save pacman last position */
@@ -106,13 +152,13 @@ void Pacman_liveOrDie(Pacman *pacman) {
  */
 unsigned char GetBodyCharacter(Pacman *pacman) {
    unsigned char body;
-   if (pacman->status == DEAD) {
-      body = PACMAN_DEAD;
-   } else {
+   if (pacman->direction != MOVES_NEUTRAL) {
       /* Alternate between body 1 and body 2 */
       body = PACMAN_UP_BODY1 + pacman->direction * 2 + pacman->lastBody;
       /* Toggle body type */
-      pacman->lastBody ^= 1;
+      pacman->lastBody ^= 1; 
+   } else {
+      body = PACMAN_RIGHT_BODY1;
    }
    return body;
 }

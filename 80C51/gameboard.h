@@ -8,6 +8,8 @@ int testGameboard();
 #define CHAR_BASE 0x80
 #endif
 
+#define GMB_MIDDLE_Y 8
+#define GMB_MIDDLE_X 15
 
 #define EMPTY 0x00
 
@@ -19,7 +21,6 @@ int testGameboard();
 #define PACMAN_LEFT_BODY2 (0x16 + CHAR_BASE)
 #define PACMAN_RIGHT_BODY1 (0x17 + CHAR_BASE)
 #define PACMAN_RIGHT_BODY2 (0x18 + CHAR_BASE)
-#define PACMAN_DEAD (0x19 + CHAR_BASE)
 
 #define OBSTACLE_LEFT_DOWN  (0x1A + CHAR_BASE)
 #define OBSTACLE_LEFT_UP    (0x1B + CHAR_BASE)
@@ -31,18 +32,19 @@ int testGameboard();
 #define OBSTACLE_HORIZONTAL_DOWN (0x21 + CHAR_BASE)
 #define OBSTACLE_VERTICAL_LEFT   (0x22 + CHAR_BASE)
 #define OBSTACLE_VERTICAL_RIGHT (0x23 + CHAR_BASE)
+#define OBSTACLE_FILLER (0x24 + CHAR_BASE)
 
-#define COIN_SMALL (0x24 + CHAR_BASE)
-#define COIN_LARGE (0x25 + CHAR_BASE)
-#define CHERRY (0x26 + CHAR_BASE)
-#define HEART (0x27 + CHAR_BASE)
+#define COIN_SMALL (0x25 + CHAR_BASE)
+#define COIN_LARGE (0x26 + CHAR_BASE)
+#define CHERRY (0x27 + CHAR_BASE)
+#define HEART (0x28 + CHAR_BASE)
 
-#define GHOST1_NORMAL (0x28 + CHAR_BASE)
-#define GHOST1_WEAK (0x29 + CHAR_BASE)
-#define GHOST2_NORMAL (0x2A + CHAR_BASE)
-#define GHOST2_WEAK (0x2B + CHAR_BASE)
-#define GHOST3_NORMAL (0x2C + CHAR_BASE)
-#define GHOST3_WEAK (0x2D + CHAR_BASE)
+#define GHOST1_NORMAL (0x29 + CHAR_BASE)
+#define GHOST1_WEAK (0x2A + CHAR_BASE)
+#define GHOST2_NORMAL (0x2B + CHAR_BASE)
+#define GHOST2_WEAK (0x2C + CHAR_BASE)
+#define GHOST3_NORMAL (0x2D + CHAR_BASE)
+#define GHOST3_WEAK (0x2E + CHAR_BASE)
 
 #define COIN_SMALL_POINTS 1
 #define COIN_LARGE_POINTS 5
@@ -55,5 +57,6 @@ void GMB_clear(unsigned char x0, unsigned char y0, unsigned char x1, unsigned ch
 void GMB_display(unsigned char x0, unsigned char y0, char *text);
 void GMB_drawLevel(void);
 unsigned char GMB_MovePossible(unsigned char x, unsigned y);
+void GMB_draw_text(unsigned char x0, unsigned char y0, char *text);
 
 #endif
