@@ -339,20 +339,6 @@ void GMB_draw_text(unsigned char x0, unsigned char y0, char *text) {
 }
 
 #ifdef TEST
-int bddGameboardDraw() {
-	BddExpectedContent c = {
-		"ABBBBBBBBC",
-		"D........E",
-		"D........E",
-		"D........E",
-		"FGGGGGGGGH"
-	};
-
-	BDD_clear();
-	GMB_draw(BDD_SCREEN_X, BDD_SCREEN_Y, BDD_SCREEN_X + BDD_SCREEN_WIDTH - 1, BDD_SCREEN_Y + BDD_SCREEN_HEIGHT - 1);
-	return BDD_assert(c, "GMBD");
-}
-
 int bddGameboardClear() {
 	BddExpectedContent c = {
 		"..........",
@@ -367,24 +353,43 @@ int bddGameboardClear() {
 	return BDD_assert(c, "GMBC");
 }
 
+int bddGameboardDrawFilledSquare() {
+	BddExpectedContent c = {
+		"..........",
+		"...;@=....",
+		"...BDC....",
+		"...:A<....",
+		".........."
+	};
+
+	BDD_clear();
+	
+	GMB_drawFilledSquare(SCREEN_LIMIT_X1 - 7, SCREEN_LIMIT_Y1 - 4, 2, 2);
+	   
+	return BDD_assert(c, "GMBD");
+}
+
+
 int bddGameboardDisplay() {
 	BddExpectedContent c = {
 		"..........",
-		".ABBBBBC..",
-		".D TXT E..",
-		".FGGGGGH..",
+		".;@@@@@=..",
+		".B TXT C..",
+		".:AAAAA<..",
 		".........."
 	};
 
 	BDD_clear();
 	GMB_display(BDD_SCREEN_X + 1, BDD_SCREEN_Y + 1, " TXT ");
+	
 	return BDD_assert(c, "GMBT");
+	
 }
 
 int testGameboard() {
 	int testsInError = 0;
 
-	testsInError += bddGameboardDraw();
+	testsInError += bddGameboardDrawFilledSquare();
 	testsInError += bddGameboardClear();
 	testsInError += bddGameboardDisplay();
 
