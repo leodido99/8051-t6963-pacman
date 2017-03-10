@@ -234,11 +234,11 @@ void main(void) {
 	int testsInError = 0;
 	STDIO_initialize();
 
-	//testsInError += testBuffer();
-	//testsInError += testKeyboard();
-	//testsInError += testGameboard();
-	 testsInError += testPacman();
-	 testsInError += testGhost();
+	testsInError += testBuffer();
+	testsInError += testKeyboard();
+	testsInError += testGameboard();
+	testsInError += testPacman();
+	testsInError += testGhost();
 
 	printf("%d tests en erreur", testsInError);
 
